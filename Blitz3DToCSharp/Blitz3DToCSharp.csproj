@@ -3,6 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>Blitz3DToCSharp</RootNamespace>
+    <AssemblyName>b3d2cs</AssemblyName>
   </PropertyGroup>
 
 </Project>

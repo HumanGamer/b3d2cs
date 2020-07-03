@@ -29,6 +29,10 @@ namespace Blitz3DToCSharp
             _lines = contents.Replace("\r\n", "\n").Trim().Split('\n');
 
             _includes = new List<string>();
+            _constants = new List<string>();
+            _globals = new List<string>();
+            _arrays = new List<string>();
+            _functions = new List<string>();
 
             Parse();
         }

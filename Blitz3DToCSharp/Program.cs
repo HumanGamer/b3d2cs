@@ -23,6 +23,9 @@ namespace Blitz3DToCSharp
             if (!outputFolder.EndsWith('/'))
                 outputFolder += '/';
 
+            if (!Directory.Exists(outputFolder))
+                Directory.CreateDirectory(outputFolder);
+
             string inputFolder = Path.GetDirectoryName(inputFile).Replace('\\', '/');
             if (!string.IsNullOrEmpty(inputFolder))
                 inputFolder += '/';
@@ -60,7 +63,12 @@ namespace Blitz3DToCSharp
 
             foreach (var output in CSharpOutput)
             {
-                var outputPath = outputFolder + output;
+                var outputPath = outputFolder + output.Key;
+
+                var outputBase = Path.GetDirectoryName(outputPath);
+                if (!Directory.Exists(outputBase))
+                    Directory.CreateDirectory(outputBase);
+
                 using (Stream s = File.Open(outputPath, FileMode.Create, FileAccess.Write, FileShare.Read))
                 using (StreamWriter sw = new StreamWriter(s))
                 {

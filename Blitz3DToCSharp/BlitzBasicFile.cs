@@ -260,6 +260,7 @@ namespace Blitz3DToCSharp
                         rest2 = "";
 
                     output.Add(typeName + " " + rest + ";" + rest2);
+                    continue;
                 }
 
                 output.Add("");

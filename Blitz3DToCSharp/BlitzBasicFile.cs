@@ -176,6 +176,24 @@ namespace Blitz3DToCSharp
         #region Converting
         public string ToCSharp(BlitzEnvironment environment)
         {
+            /*string fullFile = _lines.Join();
+            Tokenizer tokenizer = new Tokenizer(fullFile);
+            StringBuilder sb = new StringBuilder();
+            try
+            {
+                while (tokenizer.HasNext())
+                {
+                    char c = tokenizer.Next();
+                    if (c == ';')
+                        sb.Append("//");
+                }
+            } catch (IndexOutOfRangeException ex)
+            {
+                Console.WriteLine(ex.Message + ":\n" + ex.StackTrace);
+            }
+
+            return sb.ToString();*/
+
             List<string> output = new List<string>();
             foreach (var l in _lines)
             {
@@ -188,6 +206,60 @@ namespace Blitz3DToCSharp
                     else
                         output.Add("//");
                     continue;
+                }
+
+                if (line.ToLower().StartsWith("global "))
+                {
+                    int indexInt = line.IndexOf('%');
+                    int indexFloat = line.IndexOf('#');
+                    int indexString = line.IndexOf('$');
+                    int indexEquals = line.IndexOf('=');
+
+                    BlitzType type;
+
+                    string rest = line.Substring(7);
+                    string rest2 = rest;
+                    if (indexEquals != -1)
+                        rest = rest.Substring(0, rest.IndexOf('=')).Trim();
+
+                    rest2 = rest2.Substring(rest.Length).Trim();
+
+                    if (rest.EndsWith('%'))
+                    {
+                        type = BlitzType.Integer;
+                        rest = rest.Substring(0, rest.IndexOf('%'));
+                    }
+                    else if (rest.EndsWith('#'))
+                    {
+                        type = BlitzType.Float;
+                        rest = rest.Substring(0, rest.IndexOf('#'));
+                    }
+                    else if (rest.EndsWith('$'))
+                    {
+                        type = BlitzType.String;
+                        rest = rest.Substring(0, rest.IndexOf('$'));
+                    }
+                    else
+                    {
+                        type = BlitzType.Integer;
+                    }
+
+                    string typeName = "int";
+                    if (type == BlitzType.Float)
+                        typeName = "float";
+                    else if (type == BlitzType.String)
+                        typeName = "string";
+
+                    string[] split = rest2.Split(';', StringSplitOptions.RemoveEmptyEntries);
+                    if (split.Length > 0)
+                        rest += split[0].Trim();
+
+                    if (split.Length > 1)
+                        rest2 = " // " + split[1].Trim();
+                    else
+                        rest2 = "";
+
+                    output.Add(typeName + " " + rest + ";" + rest2);
                 }
 
                 output.Add("");

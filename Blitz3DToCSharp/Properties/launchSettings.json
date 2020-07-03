@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Blitz3DToCSharp": {
+      "commandName": "Project",
+      "commandLineArgs": "player.bb",
+      "workingDirectory": "D:\\Repositories\\Wonderland\\openwa"
+    }
+  }
+}

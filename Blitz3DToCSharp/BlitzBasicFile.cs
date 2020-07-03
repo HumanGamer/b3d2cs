@@ -7,6 +7,7 @@ namespace Blitz3DToCSharp
 {
     public class BlitzBasicFile
     {
+        #region Variables And Properties
         private string[] _lines;
         private List<string> _includes;
         private List<string> _constants;
@@ -23,7 +24,9 @@ namespace Blitz3DToCSharp
         public string[] Arrays => _arrays.ToArray();
 
         public string[] Functions => _functions.ToArray();
+        #endregion
 
+        #region Initialization
         public BlitzBasicFile(string contents)
         {
             _lines = contents.Replace("\r\n", "\n").Trim().Split('\n');
@@ -41,7 +44,9 @@ namespace Blitz3DToCSharp
         {
             return new BlitzBasicFile(File.ReadAllText(path));
         }
+        #endregion
 
+        #region Parsing
         private void Parse()
         {
             foreach (var l in _lines)
@@ -51,95 +56,101 @@ namespace Blitz3DToCSharp
                 if (line.StartsWith(";"))
                     continue;
 
-                if (line.StartsWith("Include ", StringComparison.OrdinalIgnoreCase))
-                {
-                    bool singleQuotes = false;
-                    int start = line.IndexOf("\"");
-                    if (start == -1)
-                    {
-                        singleQuotes = true;
-                        start = line.IndexOf("'");
-                    }
-
-                    if (start == -1)
-                        throw new InvalidFileException();
-
-                    start++;
-
-                    int end = singleQuotes ? line.LastIndexOf("'") : line.LastIndexOf("\"");
-                    if (end == -1)
-                        throw new InvalidFileException();
-
-                    _includes.Add(line.Substring(start, end - start).ToLower().Replace('\\', '/'));
-
+                string[] splitLine = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (splitLine.Length < 1)
                     continue;
-                }
-                else if (line.StartsWith("Const ", StringComparison.OrdinalIgnoreCase))
+
+                string keyword = splitLine[0].ToLower();
+
+                switch(keyword)
                 {
-                    int start = line.IndexOf(' ');
-                    if (start == -1)
-                        throw new InvalidFileException();
-
-                    start++;
-
-                    int end = line.LastIndexOf("=");
-                    if (end == -1)
-                        end = line.Length;
-
-                    _constants.Add(line.Substring(start, end - start));
-
-                    continue;
-                }
-                else if (line.StartsWith("Global ", StringComparison.OrdinalIgnoreCase))
-                {
-                    int start = line.IndexOf(' ');
-                    if (start == -1)
-                        throw new InvalidFileException();
-
-                    start++;
-
-                    int end = line.LastIndexOf("=");
-                    if (end == -1)
-                        end = line.Length;
-
-                    _globals.Add(line.Substring(start, end - start));
-
-                    continue;
-                }
-                else if (line.StartsWith("Dim ", StringComparison.OrdinalIgnoreCase))
-                {
-                    int start = line.IndexOf(' ');
-                    if (start == -1)
-                        throw new InvalidFileException();
-
-                    start++;
-
-                    int end = line.LastIndexOf("(");
-                    if (end == -1)
-                        throw new InvalidFileException();
-
-                    _arrays.Add(line.Substring(start, end - start));
-
-                    continue;
-                }
-                else if (line.StartsWith("Function ", StringComparison.OrdinalIgnoreCase))
-                {
-                    int start = line.IndexOf(' ');
-                    if (start == -1)
-                        throw new InvalidFileException();
-
-                    start++;
-
-                    int end = line.LastIndexOf("(");
-                    if (end == -1)
-                        throw new InvalidFileException();
-
-                    _functions.Add(line.Substring(start, end - start));
-
-                    continue;
+                    case "Include":
+                        ParseIncludes(line);
+                        break;
+                    case "Const":
+                        ParseVarType(line, _constants);
+                        break;
+                    case "Global":
+                        ParseVarType(line, _globals);
+                        break;
+                    case "Dim":
+                        ParseArray(line);
+                        break;
+                    case "Function":
+                        ParseFunction(line);
+                        break;
                 }
             }
         }
+
+        public void ParseIncludes(string line)
+        {
+            bool singleQuotes = false;
+            int start = line.IndexOf("\"");
+            if (start == -1)
+            {
+                singleQuotes = true;
+                start = line.IndexOf("'");
+            }
+
+            if (start == -1)
+                throw new InvalidFileException();
+
+            start++;
+
+            int end = singleQuotes ? line.LastIndexOf("'") : line.LastIndexOf("\"");
+            if (end == -1)
+                throw new InvalidFileException();
+
+            _includes.Add(line.Substring(start, end - start).ToLower().Replace('\\', '/'));
+        }
+
+        public void ParseVarType(string line, List<string> list)
+        {
+            int start = line.IndexOf(' ');
+            if (start == -1)
+                throw new InvalidFileException();
+
+            start++;
+
+            int end = line.LastIndexOf("=");
+            if (end == -1)
+                end = line.Length;
+
+            list.Add(line.Substring(start, end - start));
+        }
+
+        public void ParseArray(string line)
+        {
+            int start = line.IndexOf(' ');
+            if (start == -1)
+                throw new InvalidFileException();
+
+            start++;
+
+            int end = line.LastIndexOf("(");
+            if (end == -1)
+                throw new InvalidFileException();
+
+            _arrays.Add(line.Substring(start, end - start));
+        }
+
+        public void ParseFunction(string line)
+        {
+            int start = line.IndexOf(' ');
+            if (start == -1)
+                throw new InvalidFileException();
+
+            start++;
+
+            int end = line.LastIndexOf("(");
+            if (end == -1)
+                throw new InvalidFileException();
+
+            _functions.Add(line.Substring(start, end - start));
+        }
+
+        #endregion
 
         public string ToCSharp(BlitzEnvironment environment)
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Blitz3DToCSharp
@@ -13,6 +14,7 @@ namespace Blitz3DToCSharp
         private List<string> _constants;
         private List<string> _globals;
         private List<string> _arrays;
+        private List<string> _types;
         private List<string> _functions;
 
         public string[] Includes => _includes.ToArray();
@@ -22,6 +24,8 @@ namespace Blitz3DToCSharp
         public string[] Globals => _globals.ToArray();
 
         public string[] Arrays => _arrays.ToArray();
+
+        public string[] Types => _types.ToArray();
 
         public string[] Functions => _functions.ToArray();
         #endregion
@@ -35,6 +39,7 @@ namespace Blitz3DToCSharp
             _constants = new List<string>();
             _globals = new List<string>();
             _arrays = new List<string>();
+            _types = new List<string>();
             _functions = new List<string>();
 
             Parse();
@@ -75,6 +80,9 @@ namespace Blitz3DToCSharp
                         break;
                     case "dim":
                         ParseArray(line);
+                        break;
+                    case "type":
+                        ParseType(line);
                         break;
                     case "function":
                         ParseFunction(line);
@@ -135,6 +143,19 @@ namespace Blitz3DToCSharp
             _arrays.Add(line.Substring(start, end - start));
         }
 
+        public void ParseType(string line)
+        {
+            int start = line.IndexOf(' ');
+            if (start == -1)
+                throw new InvalidFileException();
+
+            start++;
+
+            int end = line.Length;
+
+            _functions.Add(line.Substring(start, end - start));
+        }
+
         public void ParseFunction(string line)
         {
             int start = line.IndexOf(' ');
@@ -152,9 +173,34 @@ namespace Blitz3DToCSharp
 
         #endregion
 
+        #region Converting
         public string ToCSharp(BlitzEnvironment environment)
         {
-            return "";
+            List<string> output = new List<string>();
+            foreach (var l in _lines)
+            {
+                var line = l.Trim();
+
+                if (line.StartsWith(";"))
+                {
+                    if (line.Length > 1)
+                        output.Add("//" + line.Substring(1));
+                    else
+                        output.Add("//");
+                    continue;
+                }
+
+                output.Add("");
+            }
+
+            StringBuilder sb = new StringBuilder();
+            foreach(var line in output)
+            {
+                sb.Append(line + '\n');
+            }
+
+            return sb.ToString();
         }
+        #endregion
     }
 }

@@ -27,5 +27,25 @@ namespace Blitz3DToCSharp
 
             return false;
         }
+
+        public static string Join(this string[] self)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var line in self)
+            {
+                sb.Append(line + '\n');
+            }
+            return sb.ToString();
+        }
+
+        public static string Join(this List<string> self)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var line in self)
+            {
+                sb.Append(line + '\n');
+            }
+            return sb.ToString();
+        }
     }
 }

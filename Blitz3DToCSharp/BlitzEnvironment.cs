@@ -24,17 +24,24 @@ namespace Blitz3DToCSharp
             private set;
         }
 
+        public string[] Types
+        {
+            get;
+            private set;
+        }
+
         public string[] Functions
         {
             get;
             private set;
         }
 
-        public BlitzEnvironment(string[] constants, string[] globals, string[] arrays, string[] functions)
+        public BlitzEnvironment(string[] constants, string[] globals, string[] arrays, string[] types, string[] functions)
         {
             Constants = constants;
             Globals = globals;
             Arrays = arrays;
+            Types = types;
             Functions = functions;
         }
 
@@ -43,6 +50,7 @@ namespace Blitz3DToCSharp
             List<string> constants = new List<string>();
             List<string> globals = new List<string>();
             List<string> arrays = new List<string>();
+            List<string> types = new List<string>();
             List<string> functions = new List<string>();
 
             foreach (var file in files)
@@ -65,6 +73,12 @@ namespace Blitz3DToCSharp
                         arrays.Add(array);
                 }
 
+                foreach (var type in types)
+                {
+                    if (!types.Contains(type))
+                        types.Add(type);
+                }
+
                 foreach (var function in functions)
                 {
                     if (!functions.Contains(function))
@@ -75,6 +89,7 @@ namespace Blitz3DToCSharp
             Constants = constants.ToArray();
             Globals = globals.ToArray();
             Arrays = arrays.ToArray();
+            Types = types.ToArray();
             Functions = functions.ToArray();
         }
     }

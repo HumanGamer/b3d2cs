@@ -64,19 +64,19 @@ namespace Blitz3DToCSharp
 
                 switch(keyword)
                 {
-                    case "Include":
+                    case "include":
                         ParseIncludes(line);
                         break;
-                    case "Const":
+                    case "const":
                         ParseVarType(line, _constants);
                         break;
-                    case "Global":
+                    case "global":
                         ParseVarType(line, _globals);
                         break;
-                    case "Dim":
+                    case "dim":
                         ParseArray(line);
                         break;
-                    case "Function":
+                    case "function":
                         ParseFunction(line);
                         break;
                 }
@@ -102,7 +102,7 @@ namespace Blitz3DToCSharp
             if (end == -1)
                 throw new InvalidFileException();
 
-            _includes.Add(line.Substring(start, end - start).ToLower().Replace('\\', '/'));
+            _includes.Add(line.Substring(start, end - start).Replace('\\', '/'));
         }
 
         public void ParseVarType(string line, List<string> list)

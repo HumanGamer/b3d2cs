@@ -41,13 +41,13 @@ namespace Blitz3DToCSharp
             for (int i = 0; i < includes.Count; i++)
             {
                 string fileName = inputFolder + includes[i];
-                if (files.ContainsKey(fileName))
+                if (files.Keys.ToArray().ContainsIgnoreCase(fileName))
                     continue;
                 BlitzBasicFile file = BlitzBasicFile.Read(fileName);
                 files.Add(fileName, file);
                 foreach (var include2 in file.Includes)
                 {
-                    if (!includes.Contains(include2))
+                    if (!includes.ContainsIgnoreCase(include2))
                         includes.Add(include2);
                 }
             }
